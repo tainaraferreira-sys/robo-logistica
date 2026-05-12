@@ -1,58 +1,26 @@
-import os
-import time
-from playwright.sync_api import sync_playwright
-import yagmail
-from datetime import datetime
+name: Rodar Robo Diario
 
-def capturar_e_enviar():
-    # Tenta pegar o mês atual para filtrar (Ex: Mai/26)
-    mes_atual = datetime.now().strftime('%b/%y').capitalize() 
-    
-    with sync_playwright() as p:
-        print("Iniciando navegador...")
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={'width': 1280, 'height': 900})
-        
-        # Abre o seu dashboard
-        print("Acessando o site...")
-        page.goto("https://spontaneous-valkyrie-a731ef.netlify.app/")
-        
-        # Espera o tempo necessário para o Google Sheets carregar os dados
-        time.sleep(15)
-        
-        # Tenta selecionar o mês vigente no filtro
-        try:
-            print(f"Tentando filtrar o mês: {mes_atual}")
-            page.select_option('select', label=mes_atual)
-            time.sleep(5)
-        except:
-            print("Filtro de mês não encontrado ou erro ao clicar. Seguindo com print geral.")
+on:
+  schedule:
+    - cron: '0 11 * * *'
+  workflow_dispatch:
 
-        # Tira o print da tela
-        path_print = "dashboard_status.png"
-        page.screenshot(path=path_print, full_page=True)
-        browser.close()
-        
-    print("Preparando envio de e-mail...")
-    
-    # --- CONFIGURAÇÃO DE E-MAIL ---
-    meu_email = "tainara.ferreira@gobeaute.com.br" # <--- ESCREVA SEU GMAIL AQUI
-    email_destino = "tainara.ferreira@gobeaute.com.br" # <--- EMAIL DE QUEM VAI RECEBER
-    
-    # Puxa a senha que você salvou nos "Secrets" do GitHub
-    senha_segura = os.environ.get('EMAIL_PASSWORD')
-    
-    try:
-        usuario = yagmail.SMTP(meu_email, senha_segura)
-        usuario.send(
-            to=email_destino,
-            subject=f"📊 Status Logística - {datetime.now().strftime('%d/%m/%Y')}",
-            contents="Segue o print diário do dashboard de NFs atualizado.",
-            attachments=path_print
-        )
-        print("E-mail enviado com sucesso!")
-    except Exception as e:
-        print(f"Erro ao enviar e-mail: {e}")
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v3
 
-if __name__ == "__main__":
-    capturar_e_enviar()
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+
+      - name: Executar Robo
+        run: python main.py
