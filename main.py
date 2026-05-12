@@ -5,7 +5,7 @@ from datetime import datetime
 
 def rodar_robo():
     # URL DO SEU WEBHOOK
-    WEBHOOK_URL = "SUA_URL_AQUI" 
+    WEBHOOK_URL = "https://chat.googleapis.com/v1/spaces/AAQAsU0dFDo/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=MFIwEiw61ezL9BEA67igqnytNsShx71-HlmtcoNgFn4" 
     
     # Formata a data para o relatório
     hoje = datetime.now().strftime('%d/%m/%Y')
