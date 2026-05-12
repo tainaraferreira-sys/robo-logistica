@@ -5,7 +5,7 @@ from datetime import datetime
 
 def capturar_e_postar_no_chat():
     mes_atual = datetime.now().strftime('%b/%y').capitalize() 
-    webhook_url = "COLE_AQUI_A_URL_DO_WEBHOOK_DO_GOOGLE_CHAT"
+    webhook_url = "https://chat.googleapis.com/v1/spaces/AAQAsU0dFDo/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=MFIwEiw61ezL9BEA67igqnytNsShx71-HlmtcoNgFn4"
 
     with sync_playwright() as p:
         print("Iniciando navegador...")
