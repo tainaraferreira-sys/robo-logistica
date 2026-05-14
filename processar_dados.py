@@ -13,17 +13,10 @@ URL_BASE = "https://metabase.gobeaute.com.br/api"
 URL_PLANILHA_NFS = "https://docs.google.com/spreadsheets/d/1Oh-3Pa5Bz02eQazMDcjI3bO1emc_O0FCqHcQ9s1DB6w/export?format=csv"
 URL_PLANILHA_CADASTRO = "https://docs.google.com/spreadsheets/d/1Ma2ynNyv0nNzLU58lVq0R9LKwEGbYr2Pkrbq3V5GB94/export?format=csv&gid=1201360779"
 
-headers = {"X-Metabase-Session": SESSION_ID}
-
-def get_metabase_data(card_id):
-    try:
-        response = requests.post(f"{URL_BASE}/card/{card_id}/query/json", headers=headers)
-        df = pd.DataFrame(response.json())
-        df.columns = [str(c).lower().strip() for c in df.columns]
-        return df
-    except Exception as e:
-        print(f"Erro no Metabase Card {card_id}: {e}")
-        return pd.DataFrame()
+headers = {
+    "X-Metabase-Session": SESSION_ID,
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+}
 
 # 1. Carregar Bases de Dados
 print("Carregando planilhas e Metabase...")
