@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Conciliação de NFs - GoBeaute</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+            background-color: #f8fafc;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8fafc;
+            color: #334155;
+        }
+        .header {
+            background-color: #1e293b;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .header h1 { margin: 0; font-size: 24px; }
+        .header p { margin: 5px 0 0; opacity: 0.8; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        th {
+            background-color: #334155;
+            color: white;
+            text-align: left;
+            padding: 12px 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+        }
+        tr:nth-child(even) { background-color: #f1f5f9; }
+        
+        .status-pill {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 11px;
+            display: inline-block;
+        }
+        .ok { background-color: #dcfce7; color: #166534; }
+        .error { background-color: #fee2e2; color: #991b1b; }
+        .warning { background-color: #fef9c3; color: #854d0e; }
+        .info { background-color: #e0f2fe; color: #075985; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Conciliação de Notas Fiscais vs Pedidos Protheus</h1>
+        <p>Atualizado automaticamente via GitHub Actions & Netlify</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Número NF</th>
+                <th>SKU</th>
+                <th>EAN</th>
+                <th>Status do Pedido</th>
+                <th>Pedido Protheus</th>
+                <th>Lançada (Estoque)</th>
+            </tr>
+        </thead>
+        <tbody id="tabela-corpo">
+            <!-- Os dados do JSON entrarão aqui -->
+            <tr>
+                <td colspan="6" style="text-align:center;">Carregando dados do arquivo dados_conciliados.json...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Este script lerá o arquivo gerado pela sua automação
+        fetch('dados_conciliados.json')
+            .then(response => response.json())
+            .then(data => {
+                const corpo = document.getElementById('tabela-corpo');
+                corpo.innerHTML = '';
+                
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    let statusClass = 'error';
+                    if(item.status_pedido === 'PEDIDO OK') statusClass = 'ok';
+                    if(item.status_pedido.includes('SALDO')) statusClass = 'warning';
+                    
+                    let lancadaClass = item.foi_lancada === 'SIM' ? 'ok' : 'info';
+
+                    row.innerHTML = `
+                        <td><b>${item.nf}</b></td>
+                        <td>${item.sku || '---'}</td>
+                        <td>${item.ean || '---'}</td>
+                        <td><span class="status-pill ${statusClass}">${item.status_pedido}</span></td>
+                        <td>${item.pedido_protheus}</td>
+                        <td><span class="status-pill ${lancadaClass}">${item.foi_lancada}</span></td>
+                    `;
+                    corpo.appendChild(row);
+                });
+            })
+            .catch(err => {
+                document.getElementById('tabela-corpo').innerHTML = 
+                    '<tr><td colspan="6" style="color:red; text-align:center;">Erro ao carregar dados_conciliados.json. Verifique se o arquivo já foi gerado no GitHub.</td></tr>';
+            });
+    </script>
+</body>
+</html>
