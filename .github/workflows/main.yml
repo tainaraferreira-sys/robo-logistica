@@ -1,0 +1,23 @@
+name: Atualizar Conciliação
+on:
+  schedule:
+    - cron: '0 8 * * *' # Roda todo dia às 8h
+  workflow_dispatch: # Permite rodar na mão quando quiser
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Rodar Script
+        env:
+          METABASE_SESSION: ${{ secrets.METABASE_SESSION }}
+        run: |
+          pip install pandas requests openpyxl
+          python processar_dados.py
+      - name: Commit dos dados
+        run: |
+          git config --global user.name 'Bot'
+          git add dados_conciliados.json
+          git commit -m "Dados atualizados"
+          git push
